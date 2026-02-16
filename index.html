@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Subrural - Adventure Camera Behind Player</title>
+    <title>Subrural - Fixed Third Person Camera</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.9.0/dist/nipplejs.min.js"></script>
@@ -255,6 +255,12 @@
       <div id="sprint-progress"></div>
     </div>
     
+    <!-- AR/VR buttons -->
+    <div class="mode-buttons">
+      <div class="mode-btn">AR</div>
+      <div class="mode-btn">VR</div>
+    </div>
+    
     <!-- Action buttons -->
     <div id="action-buttons">
       <div class="action-btn">⚔️</div>
@@ -285,11 +291,11 @@
       
       <a-sky color="#0A1A2A"></a-sky>
 
-      <!-- Player Rig -->
+      <!-- Player Rig - This is the root that moves through the world -->
       <a-entity id="player-rig" 
                 position="0 2 0">
         
-        <!-- Player Model -->
+        <!-- Player Model - Shows the character -->
         <a-entity id="player-model" 
                   gltf-model="#player" 
                   scale="0.048 0.048 0.048"
@@ -298,7 +304,7 @@
                   animation-mixer="clip: idle; crossFadeDuration: 0.2">
         </a-entity>
         
-        <!-- Fallback player -->
+        <!-- Fallback player (only shows if gltf fails) -->
         <a-entity id="player-fallback" visible="false">
           <a-sphere color="#4CAF50" radius="1.6" position="0 2.4 0"></a-sphere>
           <a-sphere color="#FFC107" radius="0.8" position="0 4.4 0"></a-sphere>
@@ -308,15 +314,14 @@
           <a-cylinder color="#2E7D32" radius="0.4" height="2.4" position="0.8 1.2 0"></a-cylinder>
         </a-entity>
 
-        <!-- ADVENTURE CAMERA - Positioned behind player and follows everywhere -->
-        <a-entity id="camera-rig" 
-                  position="0 5 7"  <!-- X:0 (centered), Y:5 (height), Z:7 (behind player) -->
-                  rotation="0 180 0"> <!-- Rotated 180° to look at player -->
-          <a-entity id="camera" 
-                    camera 
-                    look-controls="pointerLockEnabled: false; enabled: true"
-                    wasd-controls="enabled: false">
-          </a-entity>
+        <!-- FIXED THIRD PERSON CAMERA - Positioned like in the image -->
+        <!-- Camera is positioned behind and above the player, fixed relative to player -->
+        <a-entity id="camera" 
+                  camera 
+                  position="0 5 8"  <!-- X:0 (centered), Y:5 (head height), Z:8 (behind) -->
+                  rotation="0 0 0"   <!-- Looking straight ahead (will be adjusted to look at player) -->
+                  look-controls="enabled: false"
+                  wasd-controls="enabled: false">
         </a-entity>
       </a-entity>
 
@@ -353,17 +358,16 @@
         if (!scene) return;
 
         scene.addEventListener('loaded', () => {
-          console.log('Scene loaded, initializing adventure camera...');
+          console.log('Scene loaded, initializing fixed third-person camera...');
           
           const rig = document.getElementById('player-rig');
           const model = document.getElementById('player-model');
           const fallback = document.getElementById('player-fallback');
-          const cameraRig = document.getElementById('camera-rig');
           const camera = document.getElementById('camera');
           const sprintBtn = document.getElementById('sprint-btn');
           const sprintProgress = document.getElementById('sprint-progress');
           
-          if (!rig || !model || !cameraRig || !camera) return;
+          if (!rig || !model || !camera) return;
 
           // Movement state
           let moveDirection = { x: 0, y: 0 };
@@ -373,11 +377,9 @@
           const SPRINT_DRAIN_RATE = 25;
           const SPRINT_RECHARGE_RATE = 15;
           
-          // CAMERA state - for look controls (camera rotation relative to player)
-          let cameraRotation = { x: 15, y: 0 }; // Start with slight downward angle
-          let touchStart = { x: 0, y: 0 };
-          let isTouching = false;
-          const CAMERA_SENSITIVITY = 0.3;
+          // CAMERA state - fixed position relative to player
+          // Camera is already positioned at 0,5,8 relative to player-rig
+          // No need to update camera position as it's a child of player-rig
           
           // Animation state
           let currentAnim = 'idle';
@@ -482,88 +484,6 @@
             sprintBtn.classList.remove('active');
           });
 
-          // CAMERA CONTROLS - Look around (camera rotates relative to player)
-          document.addEventListener('touchstart', (e) => {
-            if (e.target.classList.contains('action-btn') || 
-                e.target.id === 'sprint-btn' ||
-                e.target.closest('.nipple')) return;
-            isTouching = true;
-            touchStart.x = e.touches[0].clientX;
-            touchStart.y = e.touches[0].clientY;
-          }, { passive: true });
-
-          document.addEventListener('touchmove', (e) => {
-            if (!isTouching || 
-                e.target.classList.contains('action-btn') || 
-                e.target.id === 'sprint-btn' ||
-                e.target.closest('.nipple')) return;
-            e.preventDefault();
-            
-            const touchEnd = {
-              x: e.touches[0].clientX,
-              y: e.touches[0].clientY
-            };
-            
-            const deltaX = touchEnd.x - touchStart.x;
-            const deltaY = touchEnd.y - touchStart.y;
-            
-            // Update camera rotation (look controls)
-            cameraRotation.y += deltaX * CAMERA_SENSITIVITY;
-            cameraRotation.x = Math.max(5, Math.min(45, cameraRotation.x - deltaY * CAMERA_SENSITIVITY));
-            cameraRotation.y = cameraRotation.y % 360;
-            
-            updateCameraRotation();
-            touchStart = touchEnd;
-          }, { passive: false });
-
-          document.addEventListener('touchend', () => {
-            isTouching = false;
-          });
-
-          // Mouse drag for camera (desktop)
-          let isMouseDown = false;
-          let mouseStart = { x: 0, y: 0 };
-
-          document.addEventListener('mousedown', (e) => {
-            if (e.target.classList.contains('action-btn') || 
-                e.target.id === 'sprint-btn' ||
-                e.target.closest('.nipple')) return;
-            isMouseDown = true;
-            mouseStart.x = e.clientX;
-            mouseStart.y = e.clientY;
-          });
-
-          document.addEventListener('mousemove', (e) => {
-            if (!isMouseDown || 
-                e.target.classList.contains('action-btn') || 
-                e.target.id === 'sprint-btn' ||
-                e.target.closest('.nipple')) return;
-            
-            const deltaX = e.clientX - mouseStart.x;
-            const deltaY = e.clientY - mouseStart.y;
-            
-            cameraRotation.y += deltaX * CAMERA_SENSITIVITY * 0.5;
-            cameraRotation.x = Math.max(5, Math.min(45, cameraRotation.x - deltaY * CAMERA_SENSITIVITY * 0.5));
-            cameraRotation.y = cameraRotation.y % 360;
-            
-            updateCameraRotation();
-            mouseStart.x = e.clientX;
-            mouseStart.y = e.clientY;
-          });
-
-          document.addEventListener('mouseup', () => {
-            isMouseDown = false;
-          });
-
-          // Update camera rotation (look controls)
-          function updateCameraRotation() {
-            cameraRig.setAttribute('rotation', {
-              x: cameraRotation.x,
-              y: 180 + cameraRotation.y, // Add 180° because camera is behind player
-              z: 0
-            });
-          }
-
           // Collision detection
           function checkCollision(newPosition) {
             const buildingZones = [
@@ -597,6 +517,30 @@
             }
           }
 
+          // Make camera look at player
+          function updateCameraTarget() {
+            // Camera is a child of player-rig, so we need to rotate it to look at the player
+            // The camera is at (0,5,8) relative to player-rig
+            // To look at player (0,2,0) relative to player-rig, we need to rotate accordingly
+            const cameraPos = { x: 0, y: 5, z: 8 };
+            const playerPos = { x: 0, y: 2, z: 0 };
+            
+            // Calculate direction vector from camera to player
+            const dx = playerPos.x - cameraPos.x;
+            const dy = playerPos.y - cameraPos.y;
+            const dz = playerPos.z - cameraPos.z;
+            
+            // Calculate rotation to look at player
+            const yaw = Math.atan2(dx, dz) * (180 / Math.PI);
+            const pitch = Math.atan2(dy, Math.sqrt(dx*dx + dz*dz)) * (180 / Math.PI);
+            
+            camera.setAttribute('rotation', {
+              x: -pitch, // Negative because of A-Frame rotation conventions
+              y: yaw,
+              z: 0
+            });
+          }
+
           // Main game loop
           function tick() {
             const now = performance.now();
@@ -628,30 +572,20 @@
                 const sprintSpeed = 7.0;
                 const speed = (isSprinting && sprintCharge > 0 ? sprintSpeed : baseSpeed) * delta;
                 
-                // Calculate movement direction based on camera's look direction
-                // This makes movement feel natural in adventure games
-                const cameraRad = ((cameraRotation.y + 180) * Math.PI) / 180; // Add 180° because camera is behind player
+                // For fixed camera, movement is relative to world axes (not camera)
+                // This makes the player move in the direction the joystick points
                 
-                // Forward direction (where camera is looking)
-                const forwardX = -Math.sin(cameraRad);
-                const forwardZ = -Math.cos(cameraRad);
-                
-                // Right direction
-                const rightX = Math.cos(cameraRad);
-                const rightZ = -Math.sin(cameraRad);
-                
-                // Combine joystick inputs with camera directions
                 let moveX = 0;
                 let moveZ = 0;
                 
                 if (Math.abs(moveDirection.y) > 0.1) {
-                  moveX += forwardX * moveDirection.y * speed;
-                  moveZ += forwardZ * moveDirection.y * speed;
+                  // Forward/backward in world Z direction
+                  moveZ += moveDirection.y * speed;
                 }
                 
                 if (Math.abs(moveDirection.x) > 0.1) {
-                  moveX += rightX * (-moveDirection.x) * speed;
-                  moveZ += rightZ * (-moveDirection.x) * speed;
+                  // Left/right in world X direction
+                  moveX += moveDirection.x * speed;
                 }
                 
                 let newX = position.x + moveX;
@@ -664,7 +598,8 @@
                 
                 // Rotate player to face movement direction
                 if (Math.abs(moveDirection.x) > 0.1 || Math.abs(moveDirection.y) > 0.1) {
-                  const moveAngle = Math.atan2(moveX, moveZ);
+                  // Calculate angle based on movement direction
+                  const moveAngle = Math.atan2(moveDirection.x, moveDirection.y);
                   let playerRotation = rig.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
                   playerRotation.y = (moveAngle * 180) / Math.PI;
                   rig.setAttribute('rotation', playerRotation);
@@ -687,8 +622,8 @@
               position.y = 2;
               rig.setAttribute('position', position);
               
-              // Camera automatically follows player because it's a child of player-rig
-              // No need to update camera position separately
+              // Update camera to always look at player
+              updateCameraTarget();
               
             } catch (error) {
               console.error('Error:', error);
@@ -703,6 +638,9 @@
             model.setAttribute('visible', 'true');
             fallback.setAttribute('visible', 'false');
             modelLoaded = true;
+            
+            // Initial camera look-at
+            updateCameraTarget();
           });
 
           model.addEventListener('model-error', () => {
@@ -712,15 +650,12 @@
             modelLoaded = true;
           });
 
-          // Initial camera rotation
-          updateCameraRotation();
-          
           // Start game loop
           tick();
           
-          console.log('Adventure camera initialized - always behind player');
+          console.log('Fixed third-person camera initialized');
         });
       })();
     </script>
   </body>
-      </html>
+  </html>
