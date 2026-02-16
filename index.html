@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Subrural - Reduced UI Size</title>
+    <title>Subrural - Adventure Camera Behind Player</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.9.0/dist/nipplejs.min.js"></script>
@@ -11,26 +11,25 @@
     <style>
       body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
       
-      /* Joystick container - 2x smaller */
+      /* Joystick container */
       #joystick-container {
         position: absolute;
         bottom: 30px;
         left: 30px;
-        width: 110px;  /* Reduced from 220px */
-        height: 110px;  /* Reduced from 220px */
+        width: 110px;
+        height: 110px;
         z-index: 2000;
         pointer-events: auto;
         background: rgba(0, 0, 0, 0.5);
         border-radius: 50%;
-        border: 2px solid rgba(255, 255, 255, 0.8); /* Thinner border */
+        border: 2px solid rgba(255, 255, 255, 0.8);
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 200, 0, 0.3);
         backdrop-filter: blur(5px);
       }
       
-      /* Style for the joystick elements */
       .joystick-base {
         background-color: rgba(255, 255, 255, 0.95) !important;
-        border: 2px solid #ffaa00 !important; /* Thinner border */
+        border: 2px solid #ffaa00 !important;
         box-shadow: 0 0 10px #ffaa00 !important;
       }
       
@@ -38,24 +37,24 @@
         background-color: #ffaa00 !important;
         border: 2px solid white !important;
         box-shadow: 0 0 15px #ffaa00 !important;
-        width: 35px !important;  /* Reduced from 70px */
-        height: 35px !important;  /* Reduced from 70px */
+        width: 35px !important;
+        height: 35px !important;
       }
       
-      /* Sprint button - 2x smaller */
+      /* Sprint button */
       #sprint-btn {
         position: absolute;
         bottom: 30px;
         right: 30px;
-        width: 60px;  /* Reduced from 120px */
-        height: 60px;  /* Reduced from 120px */
+        width: 60px;
+        height: 60px;
         background: rgba(255, 70, 70, 0.9);
-        border: 3px solid rgba(255, 255, 255, 0.95); /* Thinner border */
+        border: 3px solid rgba(255, 255, 255, 0.95);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;  /* Reduced from 24px */
+        font-size: 12px;
         font-weight: bold;
         color: white;
         z-index: 2000;
@@ -64,7 +63,7 @@
         transition: all 0.2s ease;
         pointer-events: auto;
         text-transform: uppercase;
-        letter-spacing: 1px;  /* Reduced from 2px */
+        letter-spacing: 1px;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
       }
       
@@ -76,19 +75,19 @@
         color: black;
       }
       
-      /* Sprint progress indicator - 2x smaller */
+      /* Sprint progress indicator */
       #sprint-progress-container {
         position: absolute;
-        bottom: 95px;  /* Adjusted from 190px */
+        bottom: 95px;
         right: 30px;
-        width: 60px;  /* Reduced from 120px */
-        height: 8px;  /* Reduced from 15px */
+        width: 60px;
+        height: 8px;
         background: rgba(0, 0, 0, 0.7);
         border-radius: 4px;
         z-index: 2001;
         overflow: hidden;
         backdrop-filter: blur(4px);
-        border: 2px solid rgba(255, 255, 255, 0.5); /* Thinner border */
+        border: 2px solid rgba(255, 255, 255, 0.5);
         box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
       }
       
@@ -101,26 +100,26 @@
         box-shadow: 0 0 8px #ffaa00;
       }
       
-      /* AR/VR buttons - 2x smaller */
+      /* AR/VR buttons */
       .mode-buttons {
         position: absolute;
         top: 15px;
         right: 15px;
         display: flex;
-        gap: 10px;  /* Reduced from 20px */
+        gap: 10px;
         z-index: 2000;
       }
       
       .mode-btn {
-        width: 40px;  /* Reduced from 80px */
-        height: 40px;  /* Reduced from 80px */
+        width: 40px;
+        height: 40px;
         background: rgba(0, 0, 0, 0.8);
-        border: 2px solid rgba(255, 255, 255, 0.9); /* Thinner border */
+        border: 2px solid rgba(255, 255, 255, 0.9);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;  /* Reduced from 24px */
+        font-size: 12px;
         font-weight: bold;
         color: white;
         backdrop-filter: blur(4px);
@@ -135,53 +134,53 @@
         border-color: #ffaa00;
       }
       
-      /* Camera control instructions - 2x smaller */
+      /* Camera control instructions */
       .instructions {
         position: absolute;
         top: 15px;
         left: 15px;
         background: rgba(0, 0, 0, 0.8);
         color: white;
-        padding: 10px 15px;  /* Reduced from 20px 30px */
-        border-radius: 10px;  /* Reduced from 20px */
-        font-size: 11px;  /* Reduced from 18px */
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-size: 11px;
         z-index: 2000;
         pointer-events: none;
         backdrop-filter: blur(4px);
-        border: 1px solid rgba(255, 255, 255, 0.4); /* Thinner border */
+        border: 1px solid rgba(255, 255, 255, 0.4);
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
-        line-height: 1.5;  /* Reduced from 2 */
+        line-height: 1.5;
         font-weight: 500;
       }
       
       .instructions span {
         color: #ffaa00;
         font-weight: bold;
-        font-size: 12px;  /* Reduced from 20px */
-        margin-right: 4px;  /* Reduced from 8px */
+        font-size: 12px;
+        margin-right: 4px;
         filter: drop-shadow(0 0 3px #ffaa00);
       }
       
-      /* Action buttons container - 2x smaller */
+      /* Action buttons container */
       #action-buttons {
         position: absolute;
         bottom: 30px;
-        right: 105px;  /* Adjusted from 210px (half) */
+        right: 105px;
         display: flex;
-        gap: 12px;  /* Reduced from 25px */
+        gap: 12px;
         z-index: 2000;
       }
       
       .action-btn {
-        width: 45px;  /* Reduced from 90px */
-        height: 45px;  /* Reduced from 90px */
+        width: 45px;
+        height: 45px;
         background: rgba(0, 0, 0, 0.8);
-        border: 2px solid rgba(255, 255, 255, 0.9); /* Thinner border */
+        border: 2px solid rgba(255, 255, 255, 0.9);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;  /* Reduced from 40px */
+        font-size: 20px;
         color: white;
         backdrop-filter: blur(4px);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
@@ -195,7 +194,6 @@
         border-color: #ffaa00;
       }
       
-      /* Mobile responsiveness - adjusted for smaller size */
       @media (max-width: 600px) {
         #joystick-container { 
           width: 90px; 
@@ -246,18 +244,18 @@
     </style>
   </head>
   <body>
-    <!-- Joystick container - now 2x smaller -->
+    <!-- Joystick container -->
     <div id="joystick-container"></div>
     
-    <!-- Sprint button - 2x smaller -->
+    <!-- Sprint button -->
     <div id="sprint-btn">SPRINT</div>
     
-    <!-- Sprint progress - 2x smaller -->
+    <!-- Sprint progress -->
     <div id="sprint-progress-container">
       <div id="sprint-progress"></div>
     </div>
     
-    <!-- Action buttons - 2x smaller -->
+    <!-- Action buttons -->
     <div id="action-buttons">
       <div class="action-btn">⚔️</div>
       <div class="action-btn">🛡️</div>
@@ -310,12 +308,13 @@
           <a-cylinder color="#2E7D32" radius="0.4" height="2.4" position="0.8 1.2 0"></a-cylinder>
         </a-entity>
 
-        <!-- ORBITAL CAMERA - Full body view -->
+        <!-- ADVENTURE CAMERA - Positioned behind player and follows everywhere -->
         <a-entity id="camera-rig" 
-                  position="0 4 0">
+                  position="0 5 7"  <!-- X:0 (centered), Y:5 (height), Z:7 (behind player) -->
+                  rotation="0 180 0"> <!-- Rotated 180° to look at player -->
           <a-entity id="camera" 
                     camera 
-                    look-controls="pointerLockEnabled: false; enabled: false"
+                    look-controls="pointerLockEnabled: false; enabled: true"
                     wasd-controls="enabled: false">
           </a-entity>
         </a-entity>
@@ -354,7 +353,7 @@
         if (!scene) return;
 
         scene.addEventListener('loaded', () => {
-          console.log('Scene loaded, initializing orbital camera and movement...');
+          console.log('Scene loaded, initializing adventure camera...');
           
           const rig = document.getElementById('player-rig');
           const model = document.getElementById('player-model');
@@ -374,17 +373,11 @@
           const SPRINT_DRAIN_RATE = 25;
           const SPRINT_RECHARGE_RATE = 15;
           
-          // ORBITAL CAMERA state
-          let cameraAngle = { 
-            horizontal: 0,
-            vertical: 20
-          };
-          const CAMERA_DISTANCE = 21;
-          const CAMERA_HEIGHT = 4;
-          
+          // CAMERA state - for look controls (camera rotation relative to player)
+          let cameraRotation = { x: 15, y: 0 }; // Start with slight downward angle
           let touchStart = { x: 0, y: 0 };
           let isTouching = false;
-          const CAMERA_SENSITIVITY = 0.5;
+          const CAMERA_SENSITIVITY = 0.3;
           
           // Animation state
           let currentAnim = 'idle';
@@ -396,13 +389,13 @@
           // BOUNDARY
           const BOUNDARY = 45;
 
-          // Initialize joystick with smaller size
+          // Initialize joystick
           const joystick = nipplejs.create({
             zone: document.getElementById('joystick-container'),
             mode: 'static',
             position: { left: '50%', top: '50%' },
             color: 'white',
-            size: 70, // Reduced from 140
+            size: 70,
             lockY: false,
             lockX: false,
             restOpacity: 1,
@@ -489,7 +482,7 @@
             sprintBtn.classList.remove('active');
           });
 
-          // CAMERA CONTROLS
+          // CAMERA CONTROLS - Look around (camera rotates relative to player)
           document.addEventListener('touchstart', (e) => {
             if (e.target.classList.contains('action-btn') || 
                 e.target.id === 'sprint-btn' ||
@@ -514,11 +507,12 @@
             const deltaX = touchEnd.x - touchStart.x;
             const deltaY = touchEnd.y - touchStart.y;
             
-            cameraAngle.horizontal += deltaX * CAMERA_SENSITIVITY;
-            cameraAngle.vertical = Math.max(10, Math.min(35, cameraAngle.vertical - deltaY * CAMERA_SENSITIVITY));
-            cameraAngle.horizontal = cameraAngle.horizontal % 360;
+            // Update camera rotation (look controls)
+            cameraRotation.y += deltaX * CAMERA_SENSITIVITY;
+            cameraRotation.x = Math.max(5, Math.min(45, cameraRotation.x - deltaY * CAMERA_SENSITIVITY));
+            cameraRotation.y = cameraRotation.y % 360;
             
-            updateCameraPosition();
+            updateCameraRotation();
             touchStart = touchEnd;
           }, { passive: false });
 
@@ -526,7 +520,7 @@
             isTouching = false;
           });
 
-          // Mouse drag for camera
+          // Mouse drag for camera (desktop)
           let isMouseDown = false;
           let mouseStart = { x: 0, y: 0 };
 
@@ -548,11 +542,11 @@
             const deltaX = e.clientX - mouseStart.x;
             const deltaY = e.clientY - mouseStart.y;
             
-            cameraAngle.horizontal += deltaX * CAMERA_SENSITIVITY * 0.3;
-            cameraAngle.vertical = Math.max(10, Math.min(35, cameraAngle.vertical - deltaY * CAMERA_SENSITIVITY * 0.3));
-            cameraAngle.horizontal = cameraAngle.horizontal % 360;
+            cameraRotation.y += deltaX * CAMERA_SENSITIVITY * 0.5;
+            cameraRotation.x = Math.max(5, Math.min(45, cameraRotation.x - deltaY * CAMERA_SENSITIVITY * 0.5));
+            cameraRotation.y = cameraRotation.y % 360;
             
-            updateCameraPosition();
+            updateCameraRotation();
             mouseStart.x = e.clientX;
             mouseStart.y = e.clientY;
           });
@@ -561,20 +555,16 @@
             isMouseDown = false;
           });
 
-          function updateCameraPosition() {
-            const horizontalRad = (cameraAngle.horizontal * Math.PI) / 180;
-            const verticalRad = (cameraAngle.vertical * Math.PI) / 180;
-            
-            const x = Math.sin(horizontalRad) * Math.cos(verticalRad) * CAMERA_DISTANCE;
-            const y = Math.sin(verticalRad) * CAMERA_DISTANCE + CAMERA_HEIGHT;
-            const z = Math.cos(horizontalRad) * Math.cos(verticalRad) * CAMERA_DISTANCE;
-            
-            cameraRig.setAttribute('position', { x, y, z });
-            
-            const lookAtAngle = Math.atan2(-x, -z) * (180 / Math.PI);
-            cameraRig.setAttribute('rotation', { x: 0, y: lookAtAngle, z: 0 });
+          // Update camera rotation (look controls)
+          function updateCameraRotation() {
+            cameraRig.setAttribute('rotation', {
+              x: cameraRotation.x,
+              y: 180 + cameraRotation.y, // Add 180° because camera is behind player
+              z: 0
+            });
           }
 
+          // Collision detection
           function checkCollision(newPosition) {
             const buildingZones = [
               { x: [-10, 10], z: [-15, -5] },
@@ -597,6 +587,7 @@
             return Math.abs(newPosition.x) > BOUNDARY || Math.abs(newPosition.z) > BOUNDARY;
           }
 
+          // Animation update
           function updateAnimation(animName) {
             if (!modelLoaded) return;
             
@@ -606,12 +597,14 @@
             }
           }
 
+          // Main game loop
           function tick() {
             const now = performance.now();
             const delta = Math.min(32, now - lastTime) / 1000;
             lastTime = now;
             
             try {
+              // Update sprint
               if (isSprinting && sprintCharge > 0) {
                 sprintCharge = Math.max(0, sprintCharge - SPRINT_DRAIN_RATE * delta);
                 if (sprintCharge <= 0) {
@@ -626,20 +619,28 @@
               
               sprintProgress.style.width = sprintCharge + '%';
               
+              // Get current player position
               let position = rig.getAttribute('position') || { x: 0, y: 2, z: 0 };
               
+              // MOVEMENT based on joystick direction
               if (Math.abs(moveDirection.x) > 0.1 || Math.abs(moveDirection.y) > 0.1) {
                 const baseSpeed = 3.5;
                 const sprintSpeed = 7.0;
                 const speed = (isSprinting && sprintCharge > 0 ? sprintSpeed : baseSpeed) * delta;
                 
-                const cameraRad = (cameraAngle.horizontal * Math.PI) / 180;
+                // Calculate movement direction based on camera's look direction
+                // This makes movement feel natural in adventure games
+                const cameraRad = ((cameraRotation.y + 180) * Math.PI) / 180; // Add 180° because camera is behind player
                 
+                // Forward direction (where camera is looking)
                 const forwardX = -Math.sin(cameraRad);
                 const forwardZ = -Math.cos(cameraRad);
+                
+                // Right direction
                 const rightX = Math.cos(cameraRad);
                 const rightZ = -Math.sin(cameraRad);
                 
+                // Combine joystick inputs with camera directions
                 let moveX = 0;
                 let moveZ = 0;
                 
@@ -661,27 +662,33 @@
                   position.z = newZ;
                 }
                 
-                const isRunning = isSprinting && sprintCharge > 0;
+                // Rotate player to face movement direction
+                if (Math.abs(moveDirection.x) > 0.1 || Math.abs(moveDirection.y) > 0.1) {
+                  const moveAngle = Math.atan2(moveX, moveZ);
+                  let playerRotation = rig.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
+                  playerRotation.y = (moveAngle * 180) / Math.PI;
+                  rig.setAttribute('rotation', playerRotation);
+                }
                 
-                if (Math.abs(moveDirection.y) > Math.abs(moveDirection.x)) {
-                  if (moveDirection.y > 0.3) {
-                    updateAnimation(isRunning ? 'run-forward' : 'walk-forward');
-                  } else if (moveDirection.y < -0.3) {
-                    updateAnimation(isRunning ? 'run-backwards' : 'walk-backwards');
-                  }
+                // Determine animation
+                const isRunning = isSprinting && sprintCharge > 0;
+                const magnitude = Math.sqrt(moveDirection.x * moveDirection.x + moveDirection.y * moveDirection.y);
+                
+                if (magnitude > 0.5 && isRunning) {
+                  updateAnimation('run-forward');
                 } else {
-                  if (moveDirection.x > 0.3) {
-                    updateAnimation(isRunning ? 'run-left' : 'walk-left');
-                  } else if (moveDirection.x < -0.3) {
-                    updateAnimation(isRunning ? 'run-right' : 'walk-right');
-                  }
+                  updateAnimation('walk-forward');
                 }
               } else {
                 updateAnimation('idle');
               }
               
+              // Keep Y position fixed
               position.y = 2;
               rig.setAttribute('position', position);
+              
+              // Camera automatically follows player because it's a child of player-rig
+              // No need to update camera position separately
               
             } catch (error) {
               console.error('Error:', error);
@@ -690,6 +697,7 @@
             requestAnimationFrame(tick);
           }
 
+          // Handle model loading
           model.addEventListener('model-loaded', () => {
             console.log('Player model loaded');
             model.setAttribute('visible', 'true');
@@ -704,12 +712,15 @@
             modelLoaded = true;
           });
 
-          updateCameraPosition();
+          // Initial camera rotation
+          updateCameraRotation();
+          
+          // Start game loop
           tick();
           
-          console.log('Orbital camera and movement initialized');
+          console.log('Adventure camera initialized - always behind player');
         });
       })();
     </script>
   </body>
-</html>
+      </html>
